@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WE ARE FAMILY - Family Savings Group</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
     <style>
         :root {
             --primary-color: #2962ff;
@@ -54,22 +57,6 @@
             padding: 0 20px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(-20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
         header {
             background-color: var(--card-bg);
             box-shadow: var(--shadow);
@@ -94,12 +81,6 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-            animation: slideIn 0.5s ease-out;
-        }
-
-        .logo i {
-            margin-right: 10px;
-            color: var(--primary-color);
         }
 
         .nav-links {
@@ -163,14 +144,12 @@
             padding: 150px 0 80px;
             text-align: center;
             background: linear-gradient(135deg, var(--secondary-color) 0%, #c3cfe2 100%);
-            animation: fadeIn 1s ease-out;
         }
 
         .hero h1 {
             font-size: 48px;
             margin-bottom: 20px;
             color: var(--dark-color);
-            animation: fadeIn 0.8s 0.2s both;
         }
 
         .hero p {
@@ -178,14 +157,12 @@
             max-width: 700px;
             margin: 0 auto 30px;
             color: #555;
-            animation: fadeIn 0.8s 0.4s both;
         }
 
         .hero-btns {
             display: flex;
             justify-content: center;
             gap: 15px;
-            animation: fadeIn 0.8s 0.6s both;
         }
 
         .btn {
@@ -227,7 +204,6 @@
         .section-title {
             text-align: center;
             margin-bottom: 50px;
-            animation: fadeIn 0.8s both;
         }
 
         .section-title h2 {
@@ -253,21 +229,12 @@
             padding: 30px;
             box-shadow: var(--shadow);
             transition: var(--transition);
-            animation: fadeIn 0.6s forwards;
-            opacity: 0;
         }
 
         .feature-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
-
-        .feature-card:nth-child(1) { animation-delay: 0.1s; }
-        .feature-card:nth-child(2) { animation-delay: 0.2s; }
-        .feature-card:nth-child(3) { animation-delay: 0.3s; }
-        .feature-card:nth-child(4) { animation-delay: 0.4s; }
-        .feature-card:nth-child(5) { animation-delay: 0.5s; }
-        .feature-card:nth-child(6) { animation-delay: 0.6s; }
 
         .feature-icon {
             font-size: 40px;
@@ -278,11 +245,6 @@
 
         .feature-card:hover .feature-icon {
             transform: scale(1.2);
-        }
-
-        .feature-card h3 {
-            font-size: 22px;
-            margin-bottom: 15px;
         }
 
         .modal {
@@ -296,7 +258,6 @@
             z-index: 1000;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s;
         }
 
         .modal-content {
@@ -307,13 +268,6 @@
             padding: 30px;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
             position: relative;
-            transform: translateY(-20px);
-            transition: var(--transition);
-            animation: fadeIn 0.3s forwards, slideIn 0.3s 0.1s forwards;
-        }
-
-        .modal.show .modal-content {
-            transform: translateY(0);
         }
 
         .close-modal {
@@ -400,6 +354,7 @@
         .dashboard {
             padding: 100px 0 40px;
             min-height: calc(100vh - 80px);
+            display: none;
         }
 
         .dashboard-header {
@@ -407,7 +362,6 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            animation: fadeIn 0.6s;
         }
 
         .dashboard-title {
@@ -428,7 +382,6 @@
             display: grid;
             grid-template-columns: 250px 1fr;
             gap: 30px;
-            animation: fadeIn 0.8s;
         }
 
         .sidebar {
@@ -461,12 +414,6 @@
             background-color: var(--secondary-color);
             color: var(--primary-color);
             transform: translateX(5px);
-        }
-
-        .sidebar-menu i {
-            margin-right: 10px;
-            width: 20px;
-            text-align: center;
         }
 
         .main-content {
@@ -625,38 +572,11 @@
             transition: width 0.6s ease;
         }
 
-        .goal-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-        }
-
-        .goal-actions button {
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .goal-actions button:hover {
-            opacity: 0.8;
-        }
-
-        .goal-actions .edit-btn {
-            background-color: var(--warning-color);
-            color: white;
-        }
-
-        .goal-actions .delete-btn {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
         .admin-controls {
             margin-top: 30px;
             padding-top: 30px;
             border-top: 1px solid #eee;
+            display: none;
         }
 
         .admin-form {
@@ -685,8 +605,6 @@
             z-index: 1000;
             display: flex;
             align-items: center;
-            animation: slideIn 0.5s, fadeIn 0.5s;
-            transition: var(--transition);
         }
 
         .notification i {
@@ -720,7 +638,6 @@
 
         .theme-toggle:hover {
             transform: scale(1.1);
-            animation: pulse 2s infinite;
         }
 
         footer {
@@ -780,23 +697,6 @@
             color: var(--light-color);
         }
 
-        .contact-image {
-            margin-top: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .contact-image img {
-            width: 100%;
-            height: auto;
-            transition: var(--transition);
-        }
-
-        .contact-image:hover img {
-            transform: scale(1.05);
-        }
-
         .social-links {
             display: flex;
             gap: 15px;
@@ -853,7 +753,6 @@
 
             .nav-links.active {
                 display: flex;
-                animation: fadeIn 0.5s;
             }
 
             .nav-links li {
@@ -909,7 +808,6 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
     <header>
         <div class="container">
             <nav class="navbar">
@@ -930,7 +828,6 @@
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="container">
             <h1>Our Family Savings Made Simple</h1>
@@ -942,7 +839,6 @@
         </div>
     </section>
 
-    <!-- Features Section -->
     <section class="features" id="features">
         <div class="container">
             <div class="section-title">
@@ -996,15 +892,14 @@
         </div>
     </section>
 
-    <!-- Login Modal -->
     <div class="modal" id="loginModal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
             <h2 class="modal-title">Member Login</h2>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" required>
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" required>
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">Password</label>
@@ -1018,7 +913,6 @@
         </div>
     </div>
 
-    <!-- Signup Modal -->
     <div class="modal" id="signupModal">
         <div class="modal-content">
             <span class="close-modal">&times;</span>
@@ -1029,20 +923,20 @@
                     <input type="text" id="signupFullname" required>
                 </div>
                 <div class="form-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" required>
+                </div>
+                <div class="form-group">
                     <label for="signupEmail">Email</label>
                     <input type="email" id="signupEmail" required>
                 </div>
                 <div class="form-group">
-                    <label for="signupPassword">Password (min 6 characters)</label>
-                    <input type="password" id="signupPassword" minlength="6" required>
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
                 </div>
                 <div class="form-group">
                     <label for="signupConfirmPassword">Confirm Password</label>
-                    <input type="password" id="signupConfirmPassword" minlength="6" required>
-                </div>
-                <div class="form-group">
-                    <label for="signupPhone">Phone Number</label>
-                    <input type="tel" id="signupPhone" required>
+                    <input type="password" id="signupConfirmPassword" required>
                 </div>
                 <button type="submit" class="form-submit">Create Account</button>
                 <div class="form-footer">
@@ -1052,8 +946,7 @@
         </div>
     </div>
 
-    <!-- Dashboard (Hidden by default) -->
-    <section class="dashboard" id="dashboard" style="display: none;">
+    <section class="dashboard" id="dashboard">
         <div class="container">
             <div class="dashboard-header">
                 <div>
@@ -1069,9 +962,9 @@
                         <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
                         <li><a href="#"><i class="fas fa-piggy-bank"></i> My Savings</a></li>
                         <li><a href="#"><i class="fas fa-history"></i> Transactions</a></li>
-                        <li><a href="#"><i class="fas fa-bullseye"></i> My Goals</a></li>
+                        <li><a href="#"><i class="fas fa-chart-pie"></i> Reports</a></li>
                         <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
-                        <li id="adminMenuItem" style="display: none;"><a href="#"><i class="fas fa-user-shield"></i> Admin</a></li>
+                        <li id="adminMenuItem"><a href="#"><i class="fas fa-user-shield"></i> Admin</a></li>
                     </ul>
                 </div>
 
@@ -1092,12 +985,8 @@
                                 <p class="positive" id="currentBalance">UGX0.00</p>
                             </div>
                             <div class="summary-card">
-                                <h3>Group Total Savings</h3>
-                                <p class="positive" id="groupTotalSavings">UGX0.00</p>
-                            </div>
-                            <div class="summary-card">
-                                <h3>My Percentage</h3>
-                                <p class="positive" id="memberPercentage">0%</p>
+                                <h3>Last Transaction</h3>
+                                <p id="lastTransaction">N/A</p>
                             </div>
                         </div>
 
@@ -1114,28 +1003,24 @@
                                     </tr>
                                 </thead>
                                 <tbody id="transactionsTable">
-                                    <!-- Transactions will be added here by JavaScript -->
                                 </tbody>
                             </table>
                         </div>
 
-                        <!-- Personal Savings Goals Section -->
-                        <div class="card" id="personalGoalsSection">
-                            <h2 class="card-title">My Savings Goals</h2>
-                            <div class="goals-container" id="personalGoalsContainer">
-                                <!-- Personal goals will be added here by JavaScript -->
+                        <div class="card" id="goalsSection">
+                            <h2 class="card-title">Family Savings Goals</h2>
+                            <div class="goals-container" id="goalsContainer">
                             </div>
-                            <form id="addPersonalGoalForm">
+                            <form id="addGoalForm">
                                 <div class="form-group" style="display: flex; gap: 10px;">
-                                    <input type="text" id="personalGoalName" placeholder="My goal name" required style="flex: 2;">
-                                    <input type="number" id="personalGoalAmount" placeholder="Target amount" required style="flex: 1;">
+                                    <input type="text" id="goalName" placeholder="Goal name" required style="flex: 2;">
+                                    <input type="number" id="goalAmount" placeholder="Target amount" required style="flex: 1;">
                                     <button type="submit" class="btn btn-primary" style="flex: 1;">Add Goal</button>
                                 </div>
                             </form>
                         </div>
 
-                        <!-- Admin Controls (Only visible to admin) -->
-                        <div class="admin-controls" id="adminControls" style="display: none;">
+                        <div class="admin-controls" id="adminControls">
                             <h3>Admin Controls</h3>
                             <form id="adminForm">
                                 <div class="admin-form">
@@ -1174,7 +1059,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -1213,10 +1097,10 @@
                         <li><i class="fas fa-map-marker-alt"></i> Mbale, Uganda</li>
                         <li><i class="fas fa-phone"></i> +256 704 402779</li>
                         <li><i class="fas fa-phone"></i> +256 777 954126</li>
-                        <li><i class="fas fa-envelope"></i> info@wearefamily.com</li>
+                        <li><i class="fas fa-envelope"></i> info@wearefaily.com</li>
                     </ul>
                     <div class="contact-image">
-                        <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Piggy bank saving money">
+                        <img src="https://images.unsplash.com/photo-1566438480900-0609be27a4be?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Family Savings Location">
                     </div>
                 </div>
             </div>
@@ -1226,31 +1110,29 @@
         </div>
     </footer>
 
-    <!-- Theme Toggle Button -->
     <div class="theme-toggle" id="themeToggle">
         <i class="fas fa-moon"></i>
     </div>
 
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
-
     <script>
         // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyC6jjNjE7CvNLtoP8nIce-IfRB5_dWZhAw",
-            authDomain: "we-are-family-2025.firebaseapp.com",
-            projectId: "we-are-family-2025",
-            storageBucket: "we-are-family-2025.firebasestorage.app",
-            messagingSenderId: "909160898657",
-            appId: "1:909160898657:web:46da1fdf2a5eec9a1aca20"
-        };
-
+const firebaseConfig = {
+  apiKey: "AIzaSyC6jjNjE7CvNLtoP8nIce-IfRB5_dWZhAw",
+  authDomain: "we-are-family-2025.firebaseapp.com",
+  projectId: "we-are-family-2025",
+  storageBucket: "we-are-family-2025.firebasestorage.app",
+  messagingSenderId: "909160898657",
+  appId: "1:909160898657:web:46da1fdf2a5eec9a1aca20"
+};
         // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Data structure
+        let familyMembers = [];
+        let transactions = [];
+        let savingsGoals = [];
+        let currentUser = null;
 
         // DOM Elements
         const loginModal = document.getElementById('loginModal');
@@ -1271,266 +1153,247 @@
         const totalContributionsEl = document.getElementById('totalContributions');
         const totalWithdrawalsEl = document.getElementById('totalWithdrawals');
         const currentBalanceEl = document.getElementById('currentBalance');
-        const groupTotalSavingsEl = document.getElementById('groupTotalSavings');
-        const memberPercentageEl = document.getElementById('memberPercentage');
+        const lastTransactionEl = document.getElementById('lastTransaction');
         const transactionsTable = document.getElementById('transactionsTable');
         const adminControls = document.getElementById('adminControls');
         const adminMenuItem = document.getElementById('adminMenuItem');
         const adminForm = document.getElementById('adminForm');
         const memberSelect = document.getElementById('memberSelect');
-        const personalGoalsContainer = document.getElementById('personalGoalsContainer');
-        const addPersonalGoalForm = document.getElementById('addPersonalGoalForm');
+        const goalsContainer = document.getElementById('goalsContainer');
+        const addGoalForm = document.getElementById('addGoalForm');
         const themeToggle = document.getElementById('themeToggle');
 
-    // Current user data and listeners
-    let currentUser = null;
-    let allMembers = [];
-    let allTransactions = [];
-    let groupTotalSavings = 0;
-    let memberListener = null;
-    let transactionListener = null;
+        // Initialize the app
+        function initApp() {
+            loadData();
+            checkBiWeeklyReminder();
+            setupEventListeners();
+            setupThemeToggle();
+            document.getElementById('transactionDate').valueAsDate = new Date();
+        }
 
-    // Initialize the app
-    function initApp() {
-        setupAuthStateListener();
-        checkSavingReminders();
-        setupEventListeners();
-        document.getElementById('transactionDate').valueAsDate = new Date();
-    }
+        // Load data from Firebase
+        async function loadData() {
+            try {
+                // Load current user from localStorage
+                const userJson = localStorage.getItem('currentUser');
+                if (userJson) {
+                    currentUser = JSON.parse(userJson);
+                    showDashboard();
+                }
 
-    // Enhanced Auth State Listener
-    function setupAuthStateListener() {
-        auth.onAuthStateChanged(async user => {
-            // Clean up previous listeners
-            if (memberListener) memberListener();
-            if (transactionListener) transactionListener();
+                // Load family members
+                const membersSnapshot = await database.ref('familyMembers').once('value');
+                familyMembers = membersSnapshot.val() || [];
+
+                // Load transactions
+                const txSnapshot = await database.ref('transactions').once('value');
+                transactions = txSnapshot.val() || [];
+
+                // Load savings goals
+                const goalsSnapshot = await database.ref('savingsGoals').once('value');
+                savingsGoals = goalsSnapshot.val() || [];
+
+                // If no data exists, initialize with default admin
+                if (familyMembers.length === 0) {
+                    const defaultAdmin = {
+                        id: "admin1",
+                        username: 'admin',
+                        password: 'admin123',
+                        name: 'Family Treasurer',
+                        isAdmin: true,
+                        balance: 0
+                    };
+                    familyMembers.push(defaultAdmin);
+                    await saveData();
+                }
+
+            } catch (error) {
+                console.error("Error loading data:", error);
+                showNotification("Error loading data. Please refresh the page.");
+            }
+        }
+
+        // Save data to Firebase
+        async function saveData() {
+            try {
+                await database.ref('familyMembers').set(familyMembers);
+                await database.ref('transactions').set(transactions);
+                await database.ref('savingsGoals').set(savingsGoals);
+                
+                if (currentUser) {
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                }
+            } catch (error) {
+                console.error("Error saving data:", error);
+                showNotification("Error saving data. Please try again.");
+            }
+        }
+
+        // Authentication functions
+        async function loginUser(username, password) {
+            const user = familyMembers.find(member => 
+                member.username === username && member.password === password
+            );
 
             if (user) {
-                currentUser = await getUserData(user.uid);
-                if (currentUser) {
-                    showDashboard();
-                    setupRealtimeListeners();
-                    // Force immediate refresh of data
-                    refreshAllData();
-                }
+                currentUser = user;
+                closeModal(loginModal);
+                showDashboard();
+                await saveData();
+                return true;
+            }
+            return false;
+        }
+
+        async function registerUser(fullname, username, email, password) {
+            if (familyMembers.some(member => member.username === username)) {
+                return { success: false, message: 'Username already exists' };
+            }
+
+            const newMember = {
+                id: Date.now().toString(),
+                username,
+                password,
+                name: fullname,
+                email,
+                isAdmin: false,
+                balance: 0
+            };
+
+            familyMembers.push(newMember);
+            await saveData();
+            
+            return { success: true, user: newMember };
+        }
+
+        // Dashboard functions
+        function showDashboard() {
+            dashboard.style.display = 'block';
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.features').style.display = 'none';
+            document.querySelector('footer').style.display = 'none';
+            updateDashboard();
+        }
+
+        function updateDashboard() {
+            if (!currentUser) return;
+
+            memberNameEl.textContent = currentUser.name;
+            memberStatusEl.textContent = currentUser.isAdmin ? 'Admin' : 'Member';
+            
+            if (currentUser.isAdmin) {
+                adminControls.style.display = 'block';
+                adminMenuItem.style.display = 'block';
+                memberStatusEl.style.backgroundColor = '#ff9800';
             } else {
-                currentUser = null;
-                hideDashboard();
+                adminControls.style.display = 'none';
+                adminMenuItem.style.display = 'none';
+                memberStatusEl.style.backgroundColor = '#2962ff';
             }
-        });
-    }
 
-    // New function to force refresh all data
-    async function refreshAllData() {
-        if (!currentUser) return;
-        
-        try {
-            // Refresh members data
-            const membersSnapshot = await db.collection('members').get();
-            allMembers = membersSnapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data(),
-                lastUpdated: doc.data().lastUpdated?.toDate() || new Date()
-            }));
+            const memberTransactions = transactions.filter(t => t.memberId === currentUser.id);
+            const contributions = memberTransactions
+                .filter(t => t.type === 'contribution')
+                .reduce((sum, t) => sum + t.amount, 0);
             
-            // Refresh transactions data
-            const transactionsSnapshot = await db.collection('transactions')
-                .where('memberId', '==', currentUser.id)
-                .orderBy('timestamp', 'desc')
-                .limit(10)
-                .get();
-                
-            allTransactions = transactionsSnapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-                timestamp: doc.data().timestamp?.toDate() || new Date()
-            }));
+            const withdrawals = memberTransactions
+                .filter(t => t.type === 'withdrawal')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const balance = contributions - withdrawals;
 
-            // Update UI
-            updateDashboardTotals();
-            updateTransactionsTable(allTransactions);
-            calculateGroupTotals();
-            
+            totalContributionsEl.textContent = `UGX${contributions.toFixed(2)}`;
+            totalWithdrawalsEl.textContent = `UGX${withdrawals.toFixed(2)}`;
+            currentBalanceEl.textContent = `UGX${balance.toFixed(2)}`;
+
+            if (memberTransactions.length > 0) {
+                const lastTx = memberTransactions.reduce((latest, tx) => {
+                    return new Date(tx.date) > new Date(latest.date) ? tx : latest;
+                }, memberTransactions[0]);
+                lastTransactionEl.textContent = `${lastTx.date}: ${lastTx.description} (ugx${lastTx.amount.toFixed(2)})`;
+            } else {
+                lastTransactionEl.textContent = 'N/A';
+            }
+
+            updateTransactionsTable(memberTransactions);
+
             if (currentUser.isAdmin) {
                 populateMemberSelect();
             }
-        } catch (error) {
-            console.error("Refresh error:", error);
-            showNotification("Error refreshing data");
         }
-    }
 
-    // Enhanced realtime listeners
-    function setupRealtimeListeners() {
-        if (!currentUser) return;
+        function updateTransactionsTable(transactions) {
+            transactionsTable.innerHTML = '';
+            
+            const sortedTx = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedTx.forEach(tx => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${tx.date}</td>
+                    <td>${tx.description}</td>
+                    <td>UGX${tx.amount.toFixed(2)}</td>
+                    <td>${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}</td>
+                    <td><span class="status status-${tx.status}">${tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}</span></td>
+                `;
+                
+                transactionsTable.appendChild(row);
+            });
+        }
 
-        // Member data listener
-        memberListener = db.collection('members').onSnapshot(snapshot => {
-            allMembers = snapshot.docs.map(doc => ({ 
-                id: doc.id, 
-                ...doc.data(),
-                lastUpdated: doc.data().lastUpdated?.toDate() || new Date()
-            }));
+        function populateMemberSelect() {
+            memberSelect.innerHTML = '<option value="">Select Member</option>';
             
-            calculateGroupTotals();
+            familyMembers
+                .filter(member => !member.isAdmin && member.id !== currentUser.id)
+                .forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member.id;
+                    option.textContent = member.name;
+                    memberSelect.appendChild(option);
+                });
+        }
+
+        function renderGoals() {
+            goalsContainer.innerHTML = '';
+            savingsGoals.forEach(goal => {
+                const progressPercent = Math.min(100, (goal.current / goal.target) * 100);
+                const goalEl = document.createElement('div');
+                goalEl.className = 'goal-card';
+                goalEl.innerHTML = `
+                    <h3>${goal.name}</h3>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <p>${goal.current.toFixed(2)} / ${goal.target.toFixed(2)} (${Math.round(progressPercent)}%)</p>
+                `;
+                goalsContainer.appendChild(goalEl);
+            });
+        }
+
+        function updateGoalsWithContribution(amount) {
+            if (savingsGoals.length === 0) return;
             
-            if (currentUser.isAdmin) {
-                populateMemberSelect();
+            const perGoal = amount / savingsGoals.length;
+            savingsGoals.forEach(goal => {
+                goal.current = Math.min(goal.target, goal.current + perGoal);
+            });
+            
+            renderGoals();
+            saveData();
+        }
+
+        function checkBiWeeklyReminder() {
+            const today = new Date();
+            const dayOfMonth = today.getDate();
+            
+            if (dayOfMonth === 13 || dayOfMonth === 27) {
+                showNotification("Reminder: Today is bi-weekly savings day! Don't forget to make your contribution.");
             }
-        }, error => {
-            console.error("Members listener error:", error);
-            showNotification("Error loading member data");
-        });
-
-        // Transactions listener with proper error handling
-        transactionListener = db.collection('transactions')
-            .where('memberId', '==', currentUser.id)
-            .orderBy('timestamp', 'desc')
-            .limit(10)
-            .onSnapshot(snapshot => {
-                allTransactions = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    timestamp: doc.data().timestamp?.toDate() || new Date()
-                }));
-                
-                updateTransactionsTable(allTransactions);
-                updateDashboardTotals();
-            }, error => {
-                console.error("Transactions listener error:", error);
-                showNotification("Error loading transactions");
-            });
-    }
-
-    // Fixed dashboard totals calculation
-    function updateDashboardTotals() {
-        if (!currentUser || !allTransactions) {
-            console.log("No current user or transactions available");
-            return;
         }
 
-        console.log("Calculating totals from transactions:", allTransactions);
-        
-        // Calculate totals from transactions
-        const contributions = allTransactions
-            .filter(t => t.type === 'contribution')
-            .reduce((sum, t) => sum + t.amount, 0);
-        
-        const withdrawals = allTransactions
-            .filter(t => t.type === 'withdrawal')
-            .reduce((sum, t) => sum + t.amount, 0);
-        
-        const balance = contributions - withdrawals;
-
-        console.log("Calculated values:", {
-            contributions,
-            withdrawals,
-            balance
-        });
-
-        // Update UI elements
-        totalContributionsEl.textContent = `UGX${contributions.toFixed(2)}`;
-        totalWithdrawalsEl.textContent = `UGX${withdrawals.toFixed(2)}`;
-        currentBalanceEl.textContent = `UGX${balance.toFixed(2)}`;
-    }
-
-    // Enhanced group totals calculation
-    function calculateGroupTotals() {
-        if (!allMembers.length) {
-            console.log("No members data available");
-            return;
-        }
-
-        groupTotalSavings = allMembers.reduce((total, member) => {
-            return total + (member.balance || 0);
-        }, 0);
-        
-        groupTotalSavingsEl.textContent = `UGX${groupTotalSavings.toFixed(2)}`;
-        
-        if (groupTotalSavings > 0 && currentUser) {
-            const percentage = ((currentUser.balance || 0) / groupTotalSavings) * 100;
-            memberPercentageEl.textContent = `${percentage.toFixed(1)}%`;
-        } else {
-            memberPercentageEl.textContent = "0%";
-        }
-    }
-
-    // Enhanced admin transaction handling
-    async function handleAdminFormSubmit(e) {
-        e.preventDefault();
-        
-        const memberId = memberSelect.value;
-        const type = document.getElementById('transactionType').value;
-        const amount = parseFloat(document.getElementById('transactionAmount').value);
-        const date = document.getElementById('transactionDate').value;
-        const description = document.getElementById('transactionDescription').value;
-        
-        if (!memberId || isNaN(amount) || !date || !description) {
-            showNotification('Please fill all fields with valid values');
-            return;
-        }
-
-        const submitBtn = adminForm.querySelector('.form-submit');
-        const originalBtnText = submitBtn.textContent;
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Processing...';
-
-        try {
-            // Get member reference
-            const memberRef = db.collection('members').doc(memberId);
-            
-            // Run transaction
-            await db.runTransaction(async (transaction) => {
-                // Get current member data
-                const memberDoc = await transaction.get(memberRef);
-                
-                if (!memberDoc.exists) {
-                    throw new Error("Member not found");
-                }
-
-                const currentBalance = memberDoc.data().balance || 0;
-                const newBalance = type === 'contribution' 
-                    ? currentBalance + amount 
-                    : currentBalance - amount;
-
-                // Create transaction record
-                const transactionRef = db.collection('transactions').doc();
-                transaction.set(transactionRef, {
-                    memberId,
-                    date,
-                    description,
-                    amount,
-                    type,
-                    status: 'completed',
-                    recordedBy: currentUser.id,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                // Update member balance
-                transaction.update(memberRef, {
-                    balance: newBalance,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            });
-
-            // Reset form
-            adminForm.reset();
-            document.getElementById('transactionDate').valueAsDate = new Date();
-            showNotification('Transaction recorded successfully!');
-            
-            // Force refresh data
-            refreshAllData();
-
-        } catch (error) {
-            console.error("Transaction error:", error);
-            showNotification('Error: ' + error.message);
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalBtnText;
-        }
-    }
-
-        // Notification system
         function showNotification(message) {
             const notification = document.createElement('div');
             notification.className = 'notification';
@@ -1553,72 +1416,25 @@
             }, 10000);
         }
 
-        // Saving reminders
-        function checkSavingReminders() {
-            const today = new Date();
-            const dayOfMonth = today.getDate();
-            
-            if (dayOfMonth === 13 || dayOfMonth === 27) {
-                showNotification("Are you ready? Saving is for tomorrow... Start planning your contribution now!");
+        function setupThemeToggle() {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.replace('fa-moon', 'fa-sun');
+                    localStorage.setItem('darkMode', 'true');
+                } else {
+                    icon.classList.replace('fa-sun', 'fa-moon');
+                    localStorage.setItem('darkMode', 'false');
+                }
+            });
+
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
             }
-            
-            if (dayOfMonth === 14 || dayOfMonth === 28) {
-                showNotification("Saving is today! Don't forget to make your bi-weekly contribution.");
-            }
         }
 
-        // Modal functions
-        function openModal(modal) {
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            setTimeout(() => modal.classList.add('show'), 10);
-        }
-
-        function closeModal(modal) {
-            modal.classList.remove('show');
-            setTimeout(() => {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }, 300);
-        }
-
-        // Dashboard functions
-        function showDashboard() {
-            dashboard.style.display = 'block';
-            document.querySelector('.hero').style.display = 'none';
-            document.querySelector('.features').style.display = 'none';
-            document.querySelector('footer').style.display = 'none';
-            updateDashboard();
-        }
-
-        function hideDashboard() {
-            dashboard.style.display = 'none';
-            document.querySelector('.hero').style.display = 'block';
-            document.querySelector('.features').style.display = 'block';
-            document.querySelector('footer').style.display = 'block';
-            loginForm.reset();
-        }
-
-        function updateDashboard() {
-            if (!currentUser) return;
-
-            memberNameEl.textContent = currentUser.name;
-            memberStatusEl.textContent = currentUser.isAdmin ? 'Admin' : 'Member';
-            
-            if (currentUser.isAdmin) {
-                adminControls.style.display = 'block';
-                adminMenuItem.style.display = 'block';
-                memberStatusEl.style.backgroundColor = '#ff9800';
-            } else {
-                adminControls.style.display = 'none';
-                adminMenuItem.style.display = 'none';
-                memberStatusEl.style.backgroundColor = '#2962ff';
-            }
-
-            updateDashboardTotals();
-        }
-
-        // Setup event listeners
         function setupEventListeners() {
             // Modal buttons
             loginBtn.addEventListener('click', () => openModal(loginModal));
@@ -1636,7 +1452,7 @@
                 openModal(signupModal);
             });
 
-            // Close modals
+            // Close modal when clicking X or outside
             closeModalBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
                     const modal = this.closest('.modal');
@@ -1650,72 +1466,110 @@
                 }
             });
 
-            // Login form
+            // Login function
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const email = document.getElementById('loginEmail').value;
+                const username = document.getElementById('loginUsername').value;
                 const password = document.getElementById('loginPassword').value;
 
-                try {
-                    await auth.signInWithEmailAndPassword(email, password);
-                    closeModal(loginModal);
-                } catch (error) {
-                    console.error("Login error:", error);
-                    showNotification('Invalid email or password');
+                const success = await loginUser(username, password);
+                if (!success) {
+                    showNotification('Invalid username or password');
                 }
             });
 
-            // Logout
-            logoutBtn.addEventListener('click', async (e) => {
+            // Logout function
+            logoutBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                try {
-                    await auth.signOut();
-                } catch (error) {
-                    console.error("Logout error:", error);
-                    showNotification('Error logging out');
-                }
+                currentUser = null;
+                dashboard.style.display = 'none';
+                document.querySelector('.hero').style.display = 'block';
+                document.querySelector('.features').style.display = 'block';
+                document.querySelector('footer').style.display = 'block';
+                loginForm.reset();
+                localStorage.removeItem('currentUser');
             });
 
-            // Signup form
+            // Signup function
             signupForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                const fullname = document.getElementById('signupFullname').value;
+                const username = document.getElementById('signupUsername').value;
                 const email = document.getElementById('signupEmail').value;
                 const password = document.getElementById('signupPassword').value;
                 const confirmPassword = document.getElementById('signupConfirmPassword').value;
-                
+
                 if (password !== confirmPassword) {
                     showNotification('Passwords do not match');
                     return;
                 }
 
-                const userData = {
-                    name: document.getElementById('signupFullname').value,
-                    email: email,
-                    phone: document.getElementById('signupPhone').value,
-                    isAdmin: false,
-                    balance: 0,
-                    personalGoals: []
-                };
-
-                try {
-                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                    await db.collection('members').doc(userCredential.user.uid).set(userData);
+                const result = await registerUser(fullname, username, email, password);
+                if (result.success) {
+                    currentUser = result.user;
                     closeModal(signupModal);
+                    showDashboard();
                     showNotification('Account created successfully!');
-                } catch (error) {
-                    console.error("Signup error:", error);
-                    showNotification('Error creating account: ' + error.message);
+                } else {
+                    showNotification(result.message);
                 }
             });
 
-            // Admin form
-            adminForm.addEventListener('submit', handleAdminFormSubmit);
-
-            // Add personal goal
-            addPersonalGoalForm.addEventListener('submit', async (e) => {
+            // Admin form submission
+            adminForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const goalName = document.getElementById('personalGoalName').value;
-                const goalAmount = parseFloat(document.getElementById('personalGoalAmount').value);
+                
+                const memberId = memberSelect.value;
+                const type = document.getElementById('transactionType').value;
+                const amount = parseFloat(document.getElementById('transactionAmount').value);
+                const date = document.getElementById('transactionDate').value;
+                const description = document.getElementById('transactionDescription').value;
+                
+                if (!memberId || !amount || !date || !description) {
+                    showNotification('Please fill all fields');
+                    return;
+                }
+                
+                const newTx = {
+                    id: Date.now().toString(),
+                    memberId,
+                    date,
+                    description,
+                    amount,
+                    type,
+                    status: 'completed'
+                };
+                
+                transactions.push(newTx);
+                
+                const member = familyMembers.find(m => m.id === memberId);
+                if (member) {
+                    member.balance = type === 'contribution' 
+                        ? member.balance + amount 
+                        : member.balance - amount;
+                }
+                
+                if (type === 'contribution') {
+                    updateGoalsWithContribution(amount);
+                }
+                
+                adminForm.reset();
+                document.getElementById('transactionDate').valueAsDate = new Date();
+                
+                await saveData();
+                
+                if (currentUser.id === memberId) {
+                    updateDashboard();
+                }
+                
+                showNotification('Transaction recorded successfully');
+            });
+
+            // Add goal form submission
+            addGoalForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const goalName = document.getElementById('goalName').value;
+                const goalAmount = parseFloat(document.getElementById('goalAmount').value);
                 
                 if (!goalName || !goalAmount) {
                     showNotification('Please fill all fields');
@@ -1729,44 +1583,34 @@
                     current: 0
                 };
                 
-                try {
-                    await db.collection('members').doc(currentUser.id).update({
-                        personalGoals: firebase.firestore.FieldValue.arrayUnion(newGoal)
-                    });
-                    addPersonalGoalForm.reset();
-                    showNotification('New personal savings goal added!');
-                } catch (error) {
-                    console.error("Error adding goal:", error);
-                    showNotification('Error adding goal');
-                }
+                savingsGoals.push(newGoal);
+                renderGoals();
+                await saveData();
+                addGoalForm.reset();
+                showNotification('New savings goal added!');
             });
 
             // Mobile menu toggle
             document.querySelector('.hamburger').addEventListener('click', function() {
                 document.querySelector('.nav-links').classList.toggle('active');
             });
-
-            // Theme toggle
-            themeToggle.addEventListener('click', () => {
-                document.body.classList.toggle('dark-mode');
-                const icon = themeToggle.querySelector('i');
-                if (document.body.classList.contains('dark-mode')) {
-                    icon.classList.replace('fa-moon', 'fa-sun');
-                    localStorage.setItem('darkMode', 'true');
-                } else {
-                    icon.classList.replace('fa-sun', 'fa-moon');
-                    localStorage.setItem('darkMode', 'false');
-                }
-            });
-
-            // Check for saved theme preference
-            if (localStorage.getItem('darkMode') === 'true') {
-                document.body.classList.add('dark-mode');
-                themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-            }
         }
 
-        // Initialize the app
+        function openModal(modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeModal(modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Start the app
         initApp();
     </script>
 </body>
