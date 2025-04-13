@@ -1748,54 +1748,55 @@
                 }
             });
 
-            // Admin form submission
-            adminForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                const memberId = memberSelect.value;
-                const type = document.getElementById('transactionType').value;
-                const amount = parseFloat(document.getElementById('transactionAmount').value);
-                const date = document.getElementById('transactionDate').value;
-                const description = document.getElementById('transactionDescription').value;
-                
-                if (!memberId || !amount || !date || !description) {
-                    showNotification('Please fill all fields');
-                    return;
-                }
-                
-                try {
-                    // Add transaction to Firestore
-                    await db.collection('transactions').add({
-                        memberId,
-                        date,
-                        description,
-                        amount,
-                        type,
-                        status: 'completed',
-                        recordedBy: currentUser.id,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    // Update member's balance
-                    const member = allMembers.find(m => m.id === memberId);
-                    if (member) {
-                        const newBalance = type === 'contribution' 
-                            ? (member.balance || 0) + amount 
-                            : (member.balance || 0) - amount;
-                        
-                        await db.collection('members').doc(memberId).update({
-                            balance: newBalance
-                        });
-                    }
-                    
-                    adminForm.reset();
-                    document.getElementById('transactionDate').valueAsDate = new Date();
-                    showNotification('Transaction recorded successfully');
-                } catch (error) {
-                    console.error("Error recording transaction:", error);
-                    showNotification('Error recording transaction');
-                }
-            });
+           adminForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  
+  const memberId = memberSelect.value;
+  const amount = parseFloat(transactionAmount.value);
+  const type = transactionType.value;
+  const date = transactionDate.value || new Date().toISOString().split('T')[0];
+  const description = transactionDescription.value;
+
+  if (!memberId || isNaN(amount) {
+    showNotification('Please select a member and enter valid amount');
+    return;
+  }
+
+  try {
+    // 1. Record the transaction
+    await db.collection('transactions').add({
+      memberId,
+      amount,
+      type,
+      date,
+      description,
+      recordedBy: currentUser.id,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      status: 'completed'
+    });
+
+    // 2. Update member's balance
+    const memberRef = db.collection('members').doc(memberId);
+    await db.runTransaction(async (transaction) => {
+      const doc = await transaction.get(memberRef);
+      if (!doc.exists) throw new Error("Member not found");
+      
+      const currentBalance = doc.data().balance || 0;
+      const newBalance = type === 'contribution' 
+        ? currentBalance + amount 
+        : currentBalance - amount;
+      
+      transaction.update(memberRef, { balance: newBalance });
+    });
+
+    showNotification('Transaction recorded successfully!');
+    adminForm.reset();
+    document.getElementById('transactionDate').valueAsDate = new Date(); // Reset date
+  } catch (error) {
+    console.error("Transaction error:", error);
+    showNotification(`Error: ${error.message}`);
+  }
+});
 
             // Add personal goal form submission
             addPersonalGoalForm.addEventListener('submit', async (e) => {
