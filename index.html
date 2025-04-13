@@ -1092,12 +1092,8 @@
                                 <p class="positive" id="currentBalance">UGX0.00</p>
                             </div>
                             <div class="summary-card">
-                                <h3>Group Total Savings</h3>
-                                <p class="positive" id="groupTotalSavings">UGX0.00</p>
-                            </div>
-                            <div class="summary-card">
-                                <h3>My Percentage</h3>
-                                <p class="positive" id="memberPercentage">0%</p>
+                                <h3>Last Transaction</h3>
+                                <p id="lastTransaction">N/A</p>
                             </div>
                         </div>
 
@@ -1271,30 +1267,25 @@
         const totalContributionsEl = document.getElementById('totalContributions');
         const totalWithdrawalsEl = document.getElementById('totalWithdrawals');
         const currentBalanceEl = document.getElementById('currentBalance');
-        const groupTotalSavingsEl = document.getElementById('groupTotalSavings');
-        const memberPercentageEl = document.getElementById('memberPercentage');
+        const lastTransactionEl = document.getElementById('lastTransaction');
         const transactionsTable = document.getElementById('transactionsTable');
         const adminControls = document.getElementById('adminControls');
         const adminMenuItem = document.getElementById('adminMenuItem');
         const adminForm = document.getElementById('adminForm');
         const memberSelect = document.getElementById('memberSelect');
-        const personalGoalsContainer = document.getElementById('personalGoalsContainer');
-        const addPersonalGoalForm = document.getElementById('addPersonalGoalForm');
+        const goalsContainer = document.getElementById('goalsContainer');
+        const addGoalForm = document.getElementById('addGoalForm');
         const themeToggle = document.getElementById('themeToggle');
 
-        // Current user data and listeners
+        // Current user
         let currentUser = null;
-        let allMembers = [];
-        let allTransactions = [];
-        let groupTotalSavings = 0;
-        let memberListener = null;
-        let transactionListener = null;
-        let allTransactionsListener = null;
 
         // Initialize the app
         function initApp() {
-            setupAuthStateListener();
-            checkSavingReminders();
+            loadData();
+            checkBiWeeklyReminder();
+            if (currentUser) updateDashboard();
+            renderGoals();
             setupEventListeners();
             document.getElementById('transactionDate').valueAsDate = new Date();
         }
@@ -1405,35 +1396,53 @@
             }
         }
 
-        // Update dashboard totals
-        function updateDashboardTotals() {
-            if (!currentUser || !allTransactions) return;
-
-            const contributions = allTransactions
+            // Calculate totals
+            const memberTransactions = transactions.filter(t => t.memberId === currentUser.id);
+            const contributions = memberTransactions
                 .filter(t => t.type === 'contribution')
                 .reduce((sum, t) => sum + t.amount, 0);
             
-            const withdrawals = allTransactions
+            const withdrawals = memberTransactions
                 .filter(t => t.type === 'withdrawal')
                 .reduce((sum, t) => sum + t.amount, 0);
             
             const balance = contributions - withdrawals;
 
+            // Update totals
             totalContributionsEl.textContent = `UGX${contributions.toFixed(2)}`;
             totalWithdrawalsEl.textContent = `UGX${withdrawals.toFixed(2)}`;
             currentBalanceEl.textContent = `UGX${balance.toFixed(2)}`;
-        }
 
-        // Update transactions table
+            // Last transaction
+            if (memberTransactions.length > 0) {
+                const lastTx = memberTransactions.reduce((latest, tx) => {
+                    return new Date(tx.date) > new Date(latest.date) ? tx : latest;
+                }, memberTransactions[0]);
+                
+                lastTransactionEl.textContent = `${lastTx.date}: ${lastTx.description} (ugx${lastTx.amount.toFixed(2)})`;
+            } else {
+                lastTransactionEl.textContent = 'N/A';
+            }
+
+            // Update transactions table
+            updateTransactionsTable(memberTransactions);
+
+            // If admin, populate member select
+            if (currentUser.isAdmin) {
+                populateMemberSelect();
+            }
+       
         function updateTransactionsTable(transactions) {
             transactionsTable.innerHTML = '';
             
-            transactions.forEach(tx => {
+            // Sort by date (newest first)
+            const sortedTx = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedTx.forEach(tx => {
                 const row = document.createElement('tr');
-                const txDate = new Date(tx.date).toLocaleDateString();
                 
                 row.innerHTML = `
-                    <td>${txDate}</td>
+                    <td>${tx.date}</td>
                     <td>${tx.description}</td>
                     <td>UGX${tx.amount.toFixed(2)}</td>
                     <td>${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}</td>
