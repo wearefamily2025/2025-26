@@ -1282,259 +1282,253 @@
         const addPersonalGoalForm = document.getElementById('addPersonalGoalForm');
         const themeToggle = document.getElementById('themeToggle');
 
-        // Current user data and listeners
-        let currentUser = null;
-        let allMembers = [];
-        let allTransactions = [];
-        let groupTotalSavings = 0;
-        let memberListener = null;
-        let transactionListener = null;
-        let allTransactionsListener = null;
+    // Current user data and listeners
+    let currentUser = null;
+    let allMembers = [];
+    let allTransactions = [];
+    let groupTotalSavings = 0;
+    let memberListener = null;
+    let transactionListener = null;
 
-        // Initialize the app
-        function initApp() {
-            setupAuthStateListener();
-            checkSavingReminders();
-            setupEventListeners();
-            document.getElementById('transactionDate').valueAsDate = new Date();
-        }
+    // Initialize the app
+    function initApp() {
+        setupAuthStateListener();
+        checkSavingReminders();
+        setupEventListeners();
+        document.getElementById('transactionDate').valueAsDate = new Date();
+    }
 
-        // Firebase Auth State Listener with cleanup
-        function setupAuthStateListener() {
-            auth.onAuthStateChanged(async user => {
-                // Clean up previous listeners
-                if (memberListener) memberListener();
-                if (transactionListener) transactionListener();
-                if (allTransactionsListener) allTransactionsListener();
+    // Enhanced Auth State Listener
+    function setupAuthStateListener() {
+        auth.onAuthStateChanged(async user => {
+            // Clean up previous listeners
+            if (memberListener) memberListener();
+            if (transactionListener) transactionListener();
 
-                if (user) {
-                    currentUser = await getUserData(user.uid);
-                    if (currentUser) {
-                        showDashboard();
-                        setupRealtimeListeners();
-                    }
-                } else {
-                    currentUser = null;
-                    hideDashboard();
+            if (user) {
+                currentUser = await getUserData(user.uid);
+                if (currentUser) {
+                    showDashboard();
+                    setupRealtimeListeners();
+                    // Force immediate refresh of data
+                    refreshAllData();
                 }
-            });
-        }
-
-        // Get user data from Firestore
-        async function getUserData(userId) {
-            try {
-                const doc = await db.collection('members').doc(userId).get();
-                return doc.exists ? { id: userId, ...doc.data() } : null;
-            } catch (error) {
-                console.error("Error getting user data:", error);
-                showNotification("Error loading user data");
-                return null;
+            } else {
+                currentUser = null;
+                hideDashboard();
             }
-        }
+        });
+    }
 
-        // Setup realtime listeners with proper cleanup
-        function setupRealtimeListeners() {
-            if (!currentUser) return;
-
-            // Member data listener
-            memberListener = db.collection('members').onSnapshot(snapshot => {
-                allMembers = snapshot.docs.map(doc => ({ 
-                    id: doc.id, 
-                    ...doc.data(),
-                    lastUpdated: doc.data().lastUpdated?.toDate() || new Date()
-                }));
-                
-                // Sort members by last update time
-                allMembers.sort((a, b) => b.lastUpdated - a.lastUpdated);
-                
-                if (currentUser.isAdmin) {
-                    populateMemberSelect();
-                }
-                
-                calculateGroupTotals();
-                updateDashboardTotals();
-            }, error => {
-                console.error("Members listener error:", error);
-                showNotification("Error loading member data");
-            });
-
-            // Current user's transactions listener
-            transactionListener = db.collection('transactions')
+    // New function to force refresh all data
+    async function refreshAllData() {
+        if (!currentUser) return;
+        
+        try {
+            // Refresh members data
+            const membersSnapshot = await db.collection('members').get();
+            allMembers = membersSnapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                ...doc.data(),
+                lastUpdated: doc.data().lastUpdated?.toDate() || new Date()
+            }));
+            
+            // Refresh transactions data
+            const transactionsSnapshot = await db.collection('transactions')
                 .where('memberId', '==', currentUser.id)
                 .orderBy('timestamp', 'desc')
                 .limit(10)
-                .onSnapshot(snapshot => {
-                    allTransactions = snapshot.docs.map(doc => ({ 
-                        id: doc.id, 
-                        ...doc.data(),
-                        date: doc.data().date,
-                        timestamp: doc.data().timestamp?.toDate() || new Date()
-                    }));
-                    
-                    updateTransactionsTable(allTransactions);
-                    updateDashboardTotals();
-                }, error => {
-                    console.error("Transactions listener error:", error);
-                    showNotification("Error loading transactions");
-                });
+                .get();
+                
+            allTransactions = transactionsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                timestamp: doc.data().timestamp?.toDate() || new Date()
+            }));
 
-            // Admin listener for all transactions
+            // Update UI
+            updateDashboardTotals();
+            updateTransactionsTable(allTransactions);
+            calculateGroupTotals();
+            
             if (currentUser.isAdmin) {
-                allTransactionsListener = db.collection('transactions')
-                    .orderBy('timestamp', 'desc')
-                    .limit(50)
-                    .onSnapshot(snapshot => {
-                        // We don't need to do anything with these for now
-                        // but keeping the listener active ensures admin sees updates
-                    }, error => {
-                        console.error("All transactions listener error:", error);
-                    });
+                populateMemberSelect();
             }
+        } catch (error) {
+            console.error("Refresh error:", error);
+            showNotification("Error refreshing data");
         }
+    }
 
-        // Calculate group totals and member percentages
-        function calculateGroupTotals() {
-            groupTotalSavings = allMembers.reduce((total, member) => total + (member.balance || 0), 0);
-            groupTotalSavingsEl.textContent = `UGX${groupTotalSavings.toFixed(2)}`;
+    // Enhanced realtime listeners
+    function setupRealtimeListeners() {
+        if (!currentUser) return;
+
+        // Member data listener
+        memberListener = db.collection('members').onSnapshot(snapshot => {
+            allMembers = snapshot.docs.map(doc => ({ 
+                id: doc.id, 
+                ...doc.data(),
+                lastUpdated: doc.data().lastUpdated?.toDate() || new Date()
+            }));
             
-            if (groupTotalSavings > 0 && currentUser) {
-                const percentage = ((currentUser.balance || 0) / groupTotalSavings) * 100;
-                memberPercentageEl.textContent = `${percentage.toFixed(1)}%`;
-            } else {
-                memberPercentageEl.textContent = "0%";
+            calculateGroupTotals();
+            
+            if (currentUser.isAdmin) {
+                populateMemberSelect();
             }
-        }
+        }, error => {
+            console.error("Members listener error:", error);
+            showNotification("Error loading member data");
+        });
 
-        // Update dashboard totals
-        function updateDashboardTotals() {
-            if (!currentUser || !allTransactions) return;
-
-            const contributions = allTransactions
-                .filter(t => t.type === 'contribution')
-                .reduce((sum, t) => sum + t.amount, 0);
-            
-            const withdrawals = allTransactions
-                .filter(t => t.type === 'withdrawal')
-                .reduce((sum, t) => sum + t.amount, 0);
-            
-            const balance = contributions - withdrawals;
-
-            totalContributionsEl.textContent = `UGX${contributions.toFixed(2)}`;
-            totalWithdrawalsEl.textContent = `UGX${withdrawals.toFixed(2)}`;
-            currentBalanceEl.textContent = `UGX${balance.toFixed(2)}`;
-        }
-
-        // Update transactions table
-        function updateTransactionsTable(transactions) {
-            transactionsTable.innerHTML = '';
-            
-            transactions.forEach(tx => {
-                const row = document.createElement('tr');
-                const txDate = new Date(tx.date).toLocaleDateString();
+        // Transactions listener with proper error handling
+        transactionListener = db.collection('transactions')
+            .where('memberId', '==', currentUser.id)
+            .orderBy('timestamp', 'desc')
+            .limit(10)
+            .onSnapshot(snapshot => {
+                allTransactions = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data(),
+                    timestamp: doc.data().timestamp?.toDate() || new Date()
+                }));
                 
-                row.innerHTML = `
-                    <td>${txDate}</td>
-                    <td>${tx.description}</td>
-                    <td>UGX${tx.amount.toFixed(2)}</td>
-                    <td>${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}</td>
-                    <td><span class="status status-${tx.status}">${tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}</span></td>
-                `;
-                
-                transactionsTable.appendChild(row);
+                updateTransactionsTable(allTransactions);
+                updateDashboardTotals();
+            }, error => {
+                console.error("Transactions listener error:", error);
+                showNotification("Error loading transactions");
             });
+    }
+
+    // Fixed dashboard totals calculation
+    function updateDashboardTotals() {
+        if (!currentUser || !allTransactions) {
+            console.log("No current user or transactions available");
+            return;
         }
 
-        // Populate member select for admin
-        function populateMemberSelect() {
-            memberSelect.innerHTML = '<option value="">Select Member</option>';
-            
-            allMembers
-                .filter(member => !member.isAdmin && member.id !== currentUser.id)
-                .forEach(member => {
-                    const option = document.createElement('option');
-                    option.value = member.id;
-                    option.textContent = member.name;
-                    memberSelect.appendChild(option);
-                });
+        console.log("Calculating totals from transactions:", allTransactions);
+        
+        // Calculate totals from transactions
+        const contributions = allTransactions
+            .filter(t => t.type === 'contribution')
+            .reduce((sum, t) => sum + t.amount, 0);
+        
+        const withdrawals = allTransactions
+            .filter(t => t.type === 'withdrawal')
+            .reduce((sum, t) => sum + t.amount, 0);
+        
+        const balance = contributions - withdrawals;
+
+        console.log("Calculated values:", {
+            contributions,
+            withdrawals,
+            balance
+        });
+
+        // Update UI elements
+        totalContributionsEl.textContent = `UGX${contributions.toFixed(2)}`;
+        totalWithdrawalsEl.textContent = `UGX${withdrawals.toFixed(2)}`;
+        currentBalanceEl.textContent = `UGX${balance.toFixed(2)}`;
+    }
+
+    // Enhanced group totals calculation
+    function calculateGroupTotals() {
+        if (!allMembers.length) {
+            console.log("No members data available");
+            return;
         }
 
-        // Enhanced admin form submission with atomic updates
-        async function handleAdminFormSubmit(e) {
-            e.preventDefault();
+        groupTotalSavings = allMembers.reduce((total, member) => {
+            return total + (member.balance || 0);
+        }, 0);
+        
+        groupTotalSavingsEl.textContent = `UGX${groupTotalSavings.toFixed(2)}`;
+        
+        if (groupTotalSavings > 0 && currentUser) {
+            const percentage = ((currentUser.balance || 0) / groupTotalSavings) * 100;
+            memberPercentageEl.textContent = `${percentage.toFixed(1)}%`;
+        } else {
+            memberPercentageEl.textContent = "0%";
+        }
+    }
+
+    // Enhanced admin transaction handling
+    async function handleAdminFormSubmit(e) {
+        e.preventDefault();
+        
+        const memberId = memberSelect.value;
+        const type = document.getElementById('transactionType').value;
+        const amount = parseFloat(document.getElementById('transactionAmount').value);
+        const date = document.getElementById('transactionDate').value;
+        const description = document.getElementById('transactionDescription').value;
+        
+        if (!memberId || isNaN(amount) || !date || !description) {
+            showNotification('Please fill all fields with valid values');
+            return;
+        }
+
+        const submitBtn = adminForm.querySelector('.form-submit');
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Processing...';
+
+        try {
+            // Get member reference
+            const memberRef = db.collection('members').doc(memberId);
             
-            const memberId = memberSelect.value;
-            const type = document.getElementById('transactionType').value;
-            const amount = parseFloat(document.getElementById('transactionAmount').value);
-            const date = document.getElementById('transactionDate').value;
-            const description = document.getElementById('transactionDescription').value;
-            
-            if (!memberId || isNaN(amount) || !date || !description) {
-                showNotification('Please fill all fields with valid values');
-                return;
-            }
-
-            // Show loading state
-            const submitBtn = adminForm.querySelector('.form-submit');
-            const originalBtnText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Processing...';
-
-            try {
-                // Use a transaction to ensure atomic updates
-                await db.runTransaction(async (transaction) => {
-                    // 1. Get current member data
-                    const memberRef = db.collection('members').doc(memberId);
-                    const memberDoc = await transaction.get(memberRef);
-                    
-                    if (!memberDoc.exists) {
-                        throw new Error("Member not found");
-                    }
-
-                    const currentBalance = memberDoc.data().balance || 0;
-                    const newBalance = type === 'contribution' 
-                        ? currentBalance + amount 
-                        : currentBalance - amount;
-
-                    // 2. Create the transaction record
-                    const transactionRef = db.collection('transactions').doc();
-                    transaction.set(transactionRef, {
-                        memberId,
-                        date,
-                        description,
-                        amount,
-                        type,
-                        status: 'completed',
-                        recordedBy: currentUser.id,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    // 3. Update member balance
-                    transaction.update(memberRef, {
-                        balance: newBalance,
-                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-
-                    return { newBalance };
-                });
-
-                // Reset form on success
-                adminForm.reset();
-                document.getElementById('transactionDate').valueAsDate = new Date();
-                showNotification('Transaction recorded successfully!');
+            // Run transaction
+            await db.runTransaction(async (transaction) => {
+                // Get current member data
+                const memberDoc = await transaction.get(memberRef);
                 
-                // Force refresh all listeners
-                if (memberListener) memberListener();
-                if (transactionListener) transactionListener();
+                if (!memberDoc.exists) {
+                    throw new Error("Member not found");
+                }
 
-            } catch (error) {
-                console.error("Transaction error:", error);
-                showNotification('Error recording transaction: ' + error.message);
-            } finally {
-                // Restore button state
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalBtnText;
-            }
+                const currentBalance = memberDoc.data().balance || 0;
+                const newBalance = type === 'contribution' 
+                    ? currentBalance + amount 
+                    : currentBalance - amount;
+
+                // Create transaction record
+                const transactionRef = db.collection('transactions').doc();
+                transaction.set(transactionRef, {
+                    memberId,
+                    date,
+                    description,
+                    amount,
+                    type,
+                    status: 'completed',
+                    recordedBy: currentUser.id,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Update member balance
+                transaction.update(memberRef, {
+                    balance: newBalance,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            });
+
+            // Reset form
+            adminForm.reset();
+            document.getElementById('transactionDate').valueAsDate = new Date();
+            showNotification('Transaction recorded successfully!');
+            
+            // Force refresh data
+            refreshAllData();
+
+        } catch (error) {
+            console.error("Transaction error:", error);
+            showNotification('Error: ' + error.message);
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalBtnText;
         }
+    }
 
         // Notification system
         function showNotification(message) {
