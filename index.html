@@ -1282,11 +1282,14 @@
         const addPersonalGoalForm = document.getElementById('addPersonalGoalForm');
         const themeToggle = document.getElementById('themeToggle');
 
-        // Current user data
+        // Current user data and listeners
         let currentUser = null;
         let allMembers = [];
         let allTransactions = [];
         let groupTotalSavings = 0;
+        let memberListener = null;
+        let transactionListener = null;
+        let allTransactionsListener = null;
 
         // Initialize the app
         function initApp() {
@@ -1296,18 +1299,21 @@
             document.getElementById('transactionDate').valueAsDate = new Date();
         }
 
-        // Firebase Auth State Listener
+        // Firebase Auth State Listener with cleanup
         function setupAuthStateListener() {
             auth.onAuthStateChanged(async user => {
+                // Clean up previous listeners
+                if (memberListener) memberListener();
+                if (transactionListener) transactionListener();
+                if (allTransactionsListener) allTransactionsListener();
+
                 if (user) {
-                    // User is signed in
                     currentUser = await getUserData(user.uid);
                     if (currentUser) {
                         showDashboard();
                         setupRealtimeListeners();
                     }
                 } else {
-                    // User is signed out
                     currentUser = null;
                     hideDashboard();
                 }
@@ -1326,31 +1332,64 @@
             }
         }
 
-        // Setup realtime listeners for data updates
+        // Setup realtime listeners with proper cleanup
         function setupRealtimeListeners() {
             if (!currentUser) return;
 
-            // Listen for member updates
-            db.collection('members').onSnapshot(snapshot => {
-                allMembers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            // Member data listener
+            memberListener = db.collection('members').onSnapshot(snapshot => {
+                allMembers = snapshot.docs.map(doc => ({ 
+                    id: doc.id, 
+                    ...doc.data(),
+                    lastUpdated: doc.data().lastUpdated?.toDate() || new Date()
+                }));
+                
+                // Sort members by last update time
+                allMembers.sort((a, b) => b.lastUpdated - a.lastUpdated);
                 
                 if (currentUser.isAdmin) {
                     populateMemberSelect();
                 }
                 
                 calculateGroupTotals();
+                updateDashboardTotals();
+            }, error => {
+                console.error("Members listener error:", error);
+                showNotification("Error loading member data");
             });
 
-            // Listen for transaction updates
-            db.collection('transactions')
+            // Current user's transactions listener
+            transactionListener = db.collection('transactions')
                 .where('memberId', '==', currentUser.id)
-                .orderBy('date', 'desc')
+                .orderBy('timestamp', 'desc')
                 .limit(10)
                 .onSnapshot(snapshot => {
-                    allTransactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    allTransactions = snapshot.docs.map(doc => ({ 
+                        id: doc.id, 
+                        ...doc.data(),
+                        date: doc.data().date,
+                        timestamp: doc.data().timestamp?.toDate() || new Date()
+                    }));
+                    
                     updateTransactionsTable(allTransactions);
                     updateDashboardTotals();
+                }, error => {
+                    console.error("Transactions listener error:", error);
+                    showNotification("Error loading transactions");
                 });
+
+            // Admin listener for all transactions
+            if (currentUser.isAdmin) {
+                allTransactionsListener = db.collection('transactions')
+                    .orderBy('timestamp', 'desc')
+                    .limit(50)
+                    .onSnapshot(snapshot => {
+                        // We don't need to do anything with these for now
+                        // but keeping the listener active ensures admin sees updates
+                    }, error => {
+                        console.error("All transactions listener error:", error);
+                    });
+            }
         }
 
         // Calculate group totals and member percentages
@@ -1419,7 +1458,7 @@
                 });
         }
 
-        // Admin form submission
+        // Enhanced admin form submission with atomic updates
         async function handleAdminFormSubmit(e) {
             e.preventDefault();
             
@@ -1429,47 +1468,161 @@
             const date = document.getElementById('transactionDate').value;
             const description = document.getElementById('transactionDescription').value;
             
-            if (!memberId || !amount || !date || !description) {
-                showNotification('Please fill all fields');
+            if (!memberId || isNaN(amount) || !date || !description) {
+                showNotification('Please fill all fields with valid values');
                 return;
             }
-            
+
+            // Show loading state
+            const submitBtn = adminForm.querySelector('.form-submit');
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+
             try {
-                // Create transaction
-                await db.collection('transactions').add({
-                    memberId,
-                    date,
-                    description,
-                    amount,
-                    type,
-                    status: 'completed',
-                    recordedBy: currentUser.id,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // Update member's balance - this is the key fix
-                const memberRef = db.collection('members').doc(memberId);
+                // Use a transaction to ensure atomic updates
                 await db.runTransaction(async (transaction) => {
+                    // 1. Get current member data
+                    const memberRef = db.collection('members').doc(memberId);
                     const memberDoc = await transaction.get(memberRef);
+                    
+                    if (!memberDoc.exists) {
+                        throw new Error("Member not found");
+                    }
+
                     const currentBalance = memberDoc.data().balance || 0;
                     const newBalance = type === 'contribution' 
                         ? currentBalance + amount 
                         : currentBalance - amount;
-                    
-                    transaction.update(memberRef, { balance: newBalance });
+
+                    // 2. Create the transaction record
+                    const transactionRef = db.collection('transactions').doc();
+                    transaction.set(transactionRef, {
+                        memberId,
+                        date,
+                        description,
+                        amount,
+                        type,
+                        status: 'completed',
+                        recordedBy: currentUser.id,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    // 3. Update member balance
+                    transaction.update(memberRef, {
+                        balance: newBalance,
+                        lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    return { newBalance };
                 });
-                
+
+                // Reset form on success
                 adminForm.reset();
                 document.getElementById('transactionDate').valueAsDate = new Date();
-                showNotification('Transaction recorded successfully');
+                showNotification('Transaction recorded successfully!');
+                
+                // Force refresh all listeners
+                if (memberListener) memberListener();
+                if (transactionListener) transactionListener();
+
             } catch (error) {
-                console.error("Error recording transaction:", error);
-                showNotification('Error recording transaction');
+                console.error("Transaction error:", error);
+                showNotification('Error recording transaction: ' + error.message);
+            } finally {
+                // Restore button state
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         }
 
-        // [Rest of the helper functions and event listeners...]
-        // (Notification system, theme toggle, personal goals functions, etc.)
+        // Notification system
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <i class="fas fa-bell"></i>
+                <span>${message}</span>
+                <span class="notification-close">&times;</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            notification.querySelector('.notification-close').addEventListener('click', () => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            });
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 10000);
+        }
+
+        // Saving reminders
+        function checkSavingReminders() {
+            const today = new Date();
+            const dayOfMonth = today.getDate();
+            
+            if (dayOfMonth === 13 || dayOfMonth === 27) {
+                showNotification("Are you ready? Saving is for tomorrow... Start planning your contribution now!");
+            }
+            
+            if (dayOfMonth === 14 || dayOfMonth === 28) {
+                showNotification("Saving is today! Don't forget to make your bi-weekly contribution.");
+            }
+        }
+
+        // Modal functions
+        function openModal(modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeModal(modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Dashboard functions
+        function showDashboard() {
+            dashboard.style.display = 'block';
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.features').style.display = 'none';
+            document.querySelector('footer').style.display = 'none';
+            updateDashboard();
+        }
+
+        function hideDashboard() {
+            dashboard.style.display = 'none';
+            document.querySelector('.hero').style.display = 'block';
+            document.querySelector('.features').style.display = 'block';
+            document.querySelector('footer').style.display = 'block';
+            loginForm.reset();
+        }
+
+        function updateDashboard() {
+            if (!currentUser) return;
+
+            memberNameEl.textContent = currentUser.name;
+            memberStatusEl.textContent = currentUser.isAdmin ? 'Admin' : 'Member';
+            
+            if (currentUser.isAdmin) {
+                adminControls.style.display = 'block';
+                adminMenuItem.style.display = 'block';
+                memberStatusEl.style.backgroundColor = '#ff9800';
+            } else {
+                adminControls.style.display = 'none';
+                adminMenuItem.style.display = 'none';
+                memberStatusEl.style.backgroundColor = '#2962ff';
+            }
+
+            updateDashboardTotals();
+        }
 
         // Setup event listeners
         function setupEventListeners() {
@@ -1616,94 +1769,6 @@
             if (localStorage.getItem('darkMode') === 'true') {
                 document.body.classList.add('dark-mode');
                 themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
-            }
-        }
-
-        // Modal functions
-        function openModal(modal) {
-            modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            setTimeout(() => modal.classList.add('show'), 10);
-        }
-
-        function closeModal(modal) {
-            modal.classList.remove('show');
-            setTimeout(() => {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }, 300);
-        }
-
-        // Dashboard functions
-        function showDashboard() {
-            dashboard.style.display = 'block';
-            document.querySelector('.hero').style.display = 'none';
-            document.querySelector('.features').style.display = 'none';
-            document.querySelector('footer').style.display = 'none';
-            updateDashboard();
-        }
-
-        function hideDashboard() {
-            dashboard.style.display = 'none';
-            document.querySelector('.hero').style.display = 'block';
-            document.querySelector('.features').style.display = 'block';
-            document.querySelector('footer').style.display = 'block';
-            loginForm.reset();
-        }
-
-        function updateDashboard() {
-            if (!currentUser) return;
-
-            memberNameEl.textContent = currentUser.name;
-            memberStatusEl.textContent = currentUser.isAdmin ? 'Admin' : 'Member';
-            
-            if (currentUser.isAdmin) {
-                adminControls.style.display = 'block';
-                adminMenuItem.style.display = 'block';
-                memberStatusEl.style.backgroundColor = '#ff9800';
-            } else {
-                adminControls.style.display = 'none';
-                adminMenuItem.style.display = 'none';
-                memberStatusEl.style.backgroundColor = '#2962ff';
-            }
-
-            updateDashboardTotals();
-        }
-
-        // Notification system
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.innerHTML = `
-                <i class="fas fa-bell"></i>
-                <span>${message}</span>
-                <span class="notification-close">&times;</span>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            notification.querySelector('.notification-close').addEventListener('click', () => {
-                notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 300);
-            });
-            
-            setTimeout(() => {
-                notification.style.opacity = '0';
-                setTimeout(() => notification.remove(), 300);
-            }, 10000);
-        }
-
-        // Saving reminders
-        function checkSavingReminders() {
-            const today = new Date();
-            const dayOfMonth = today.getDate();
-            
-            if (dayOfMonth === 13 || dayOfMonth === 27) {
-                showNotification("Are you ready? Saving is for tomorrow... Start planning your contribution now!");
-            }
-            
-            if (dayOfMonth === 14 || dayOfMonth === 28) {
-                showNotification("Saving is today! Don't forget to make your bi-weekly contribution.");
             }
         }
 
