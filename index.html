@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WE ARE FAMILY - Family Savings Group</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Color Variables */
+        :root {
+            --primary-color: #2962ff;
+            --primary-dark: #0039cb;
+            --secondary-color: #f5f5f5;
+            --dark-color: #333;
+            --light-color: #fff;
+            --danger-color: #ff5252;
+            --success-color: #4caf50;
+            --warning-color: #ffab00;
+            --bg-color: #f9f9f9;
+            --text-color: #333;
+            --card-bg: #fff;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            --transition: all 0.3s ease-in-out;
+        }
+
+        /* Dark Theme Variables */
+        .dark-mode {
+            --primary-color: #448aff;
+            --primary-dark: #2962ff;
+            --bg-color: #121212;
+            --text-color: #f5f5f5;
+            --card-bg: #1e1e1e;
+            --secondary-color: #2d2d2d;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            --dark-color: #f5f5f5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: var(--transition);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        header {
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 30px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-links .btn {
+            padding: 8px 20px;
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .nav-links .btn:hover {
+            background-color: var(--primary-dark);
+            color: var(--light-color);
+            transform: translateY(-2px);
+        }
+
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: var(--text-color);
+        }
+
+        .hero {
+            padding: 150px 0 80px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #c3cfe2 100%);
+            animation: fadeIn 1s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--dark-color);
+            animation: fadeIn 0.8s 0.2s both;
+        }
+
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: #555;
+            animation: fadeIn 0.8s 0.4s both;
+        }
+
+        .hero-btns {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            animation: fadeIn 0.8s 0.6s both;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .features {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn 0.8s both;
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            animation: fadeIn 0.6s forwards;
+            opacity: 0;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover .feature-icon {
+            transform: scale(1.2);
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transform: translateY(-20px);
+            transition: var(--transition);
+            animation: fadeIn 0.3s forwards, slideIn 0.3s 0.1s forwards;
+        }
+
+        .modal.show .modal-content {
+            transform: translateY(0);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--danger-color);
+            transform: rotate(90deg);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(41, 98, 255, 0.2);
+        }
+
+        .form-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .form-submit:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .dashboard {
+            padding: 100px 0 40px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s;
+        }
+
+        .dashboard-title {
+            font-size: 28px;
+        }
+
+        .welcome-message {
+            font-size: 16px;
+            color: #666;
+        }
+
+        .welcome-message span {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            animation: fadeIn 0.8s;
+        }
+
+        .sidebar {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            height: fit-content;
+            transition: var(--transition);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: var(--text-color);
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            transform: translateX(5px);
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title .badge {
+            background-color: var(--primary-color);
+            color: var(--light-color);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .savings-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .summary-card p {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .summary-card .positive {
+            color: var(--success-color);
+        }
+
+        .summary-card .negative {
+            color: var(--danger-color);
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transactions-table th, .transactions-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transactions-table th {
+            background-color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .transactions-table tr:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-pending {
+            background-color: #fff3e0;
+            color: #ff6d00;
+        }
+
+        .status-completed {
+            background-color: #e8f5e9;
+            color: var(--success-color);
+        }
+
+        .goals-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .goal-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .goal-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .goal-card h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--success-color);
+            transition: width 0.6s ease;
+        }
+
+        .goal-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .goal-actions button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .goal-actions button:hover {
+            opacity: 0.8;
+        }
+
+        .goal-actions .edit-btn {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .goal-actions .delete-btn {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .admin-controls {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #eee;
+        }
+
+        .admin-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .admin-form .form-group {
+            margin-bottom: 0;
+        }
+
+        .admin-form .form-submit {
+            grid-column: span 2;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            animation: slideIn 0.5s, fadeIn 0.5s;
+            transition: var(--transition);
+        }
+
+        .notification i {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .notification-close {
+            margin-left: 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            animation: pulse 2s infinite;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            padding: 50px 0 20px;
+            transition: var(--transition);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-column h3 {
+            font-size: 18px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--primary-color);
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-column ul li i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .footer-column ul li a {
+            color: #bbb;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-column ul li a:hover {
+            color: var(--light-color);
+        }
+
+        .contact-image {
+            margin-top: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .contact-image img {
+            width: 100%;
+            height: auto;
+            transition: var(--transition);
+        }
+
+        .contact-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: #444;
+            border-radius: 50%;
+            color: var(--light-color);
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #bbb;
+            font-size: 14px;
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 80px;
+                left: 0;
+                width: 100%;
+                background-color: var(--card-bg);
+                flex-direction: column;
+                padding: 20px;
+                box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .nav-links.active {
+                display: flex;
+                animation: fadeIn 0.5s;
+            }
+
+            .nav-links li {
+                margin: 10px 0;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero p {
+                font-size: 18px;
+            }
+
+            .hero-btns {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                margin-bottom: 10px;
+            }
+
+            .admin-form {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-form .form-submit {
+                grid-column: span 1;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .savings-summary {
+                grid-template-columns: 1fr;
+            }
+
+            .transactions-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .goals-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    WE ARE FAMILY
+                </a>
+                <ul class="nav-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#about">About</a></li>
+                    <li><a href="#" id="loginBtn">Login</a></li>
+                    <li><a href="#" id="signupBtn" class="btn">Sign Up</a></li>
+                </ul>
+                <div class="hamburger">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Our Family Savings Made Simple</h1>
+            <p>Track, manage, and grow your savings with our easy-to-use platform designed specifically for WE ARE FAMILY savings group.</p>
+            <div class="hero-btns">
+                <a href="#" class="btn btn-primary" id="heroSignupBtn">Join Our Family</a>
+                <a href="#" class="btn btn-outline" id="heroLoginBtn">Member Login</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Why Choose WE ARE FAMILY Savings Group</h2>
+                <p>We provide a secure and transparent way to manage your our collective savings with features designed for trust and accountability.</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <h3>Secure Accounts</h3>
+                    <p>Each family member has their own secure login to view their contributions and savings balance.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Track Growth</h3>
+                    <p>Visualize your savings growth over time with clear charts and progress indicators.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Notifications</h3>
+                    <p>Get notified about contributions, withdrawals, and important group updates.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>Detailed Reports</h3>
+                    <p>Generate detailed reports of all transactions for complete transparency.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Access your savings information anytime, anywhere from any device.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Family Focused</h3>
+                    <p>Designed specifically for WE ARE FAMILY to strengthen financial bonds.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">Member Login</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="form-submit">Login</button>
+                <div class="form-footer">
+                    <p>Don't have an account? <a href="#" id="switchToSignup">Sign up</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal" id="signupModal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 class="modal-title">Join Our Family</h2>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label for="signupFullname">Full Name</label>
+                    <input type="text" id="signupFullname" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password (min 6 characters)</label>
+                    <input type="password" id="signupPassword" minlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupConfirmPassword">Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" minlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPhone">Phone Number</label>
+                    <input type="tel" id="signupPhone" required>
+                </div>
+                <button type="submit" class="form-submit">Create Account</button>
+                <div class="form-footer">
+                    <p>Already have an account? <a href="#" id="switchToLogin">Login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard (Hidden by default) -->
+    <section class="dashboard" id="dashboard" style="display: none;">
+        <div class="container">
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-title">Family Savings Dashboard</h1>
+                    <p class="welcome-message">Welcome back, <span id="memberName">Family Member</span></p>
+                </div>
+                <a href="#" class="btn btn-outline" id="logoutBtn">Logout</a>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="sidebar">
+                    <ul class="sidebar-menu">
+                        <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                        <li><a href="#"><i class="fas fa-piggy-bank"></i> My Savings</a></li>
+                        <li><a href="#"><i class="fas fa-history"></i> Transactions</a></li>
+                        <li><a href="#"><i class="fas fa-bullseye"></i> My Goals</a></li>
+                        <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                        <li id="adminMenuItem" style="display: none;"><a href="#"><i class="fas fa-user-shield"></i> Admin</a></li>
+                    </ul>
+                </div>
+
+                <div class="main-content">
+                    <div class="card">
+                        <h2 class="card-title">Savings Overview <span class="badge" id="memberStatus">Member</span></h2>
+                        <div class="savings-summary">
+                            <div class="summary-card">
+                                <h3>Total Contributions</h3>
+                                <p class="positive" id="totalContributions">UGX0.00</p>
+                            </div>
+                            <div class="summary-card">
+                                <h3>Total Withdrawals</h3>
+                                <p class="negative" id="totalWithdrawals">UGX0.00</p>
+                            </div>
+                            <div class="summary-card">
+                                <h3>Current Balance</h3>
+                                <p class="positive" id="currentBalance">UGX0.00</p>
+                            </div>
+                            <div class="summary-card">
+                                <h3>Group Total Savings</h3>
+                                <p class="positive" id="groupTotalSavings">UGX0.00</p>
+                            </div>
+                            <div class="summary-card">
+                                <h3>My Percentage</h3>
+                                <p class="positive" id="memberPercentage">0%</p>
+                            </div>
+                        </div>
+
+                        <h3>Recent Transactions</h3>
+                        <div style="overflow-x: auto;">
+                            <table class="transactions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                        <th>Amount</th>
+                                        <th>Type</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transactionsTable">
+                                    <!-- Transactions will be added here by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Personal Savings Goals Section -->
+                        <div class="card" id="personalGoalsSection">
+                            <h2 class="card-title">My Savings Goals</h2>
+                            <div class="goals-container" id="personalGoalsContainer">
+                                <!-- Personal goals will be added here by JavaScript -->
+                            </div>
+                            <form id="addPersonalGoalForm">
+                                <div class="form-group" style="display: flex; gap: 10px;">
+                                    <input type="text" id="personalGoalName" placeholder="My goal name" required style="flex: 2;">
+                                    <input type="number" id="personalGoalAmount" placeholder="Target amount" required style="flex: 1;">
+                                    <button type="submit" class="btn btn-primary" style="flex: 1;">Add Goal</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Admin Controls (Only visible to admin) -->
+                        <div class="admin-controls" id="adminControls" style="display: none;">
+                            <h3>Admin Controls</h3>
+                            <form id="adminForm">
+                                <div class="admin-form">
+                                    <div class="form-group">
+                                        <label for="memberSelect">Family Member</label>
+                                        <select id="memberSelect" class="form-control">
+                                            <option value="">Select Member</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transactionType">Transaction Type</label>
+                                        <select id="transactionType" class="form-control">
+                                            <option value="contribution">Contribution</option>
+                                            <option value="withdrawal">Withdrawal</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transactionAmount">Amount</label>
+                                        <input type="number" id="transactionAmount" step="0.01" min="0" placeholder="0.00" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transactionDate">Date</label>
+                                        <input type="date" id="transactionDate" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="transactionDescription">Description</label>
+                                        <input type="text" id="transactionDescription" placeholder="e.g. Bi-weekly savings" required>
+                                    </div>
+                                    <button type="submit" class="form-submit">Record Transaction</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>WE ARE FAMILY</h3>
+                    <p>Helping us grow our savings together through transparency, trust, and shared financial goals.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#">FAQs</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Security</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> Mbale, Uganda</li>
+                        <li><i class="fas fa-phone"></i> +256 704 402779</li>
+                        <li><i class="fas fa-phone"></i> +256 777 954126</li>
+                        <li><i class="fas fa-envelope"></i> info@wearefaily.com</li>
+                    </ul>
+                    <div class="contact-image">
+                        <img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80" alt="Piggy bank saving money">
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 WE ARE FAMILY Savings Group. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme Toggle Button -->
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase configuration - REPLACE WITH YOUR OWN CONFIG
+        const firebaseConfig = {
+  apiKey: "AIzaSyC6jjNjE7CvNLtoP8nIce-IfRB5_dWZhAw",
+  authDomain: "we-are-family-2025.firebaseapp.com",
+  projectId: "we-are-family-2025",
+  storageBucket: "we-are-family-2025.firebasestorage.app",
+  messagingSenderId: "909160898657",
+  appId: "1:909160898657:web:46da1fdf2a5eec9a1aca20"
+};
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // DOM Elements
+        const loginModal = document.getElementById('loginModal');
+        const signupModal = document.getElementById('signupModal');
+        const loginBtn = document.getElementById('loginBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const heroLoginBtn = document.getElementById('heroLoginBtn');
+        const heroSignupBtn = document.getElementById('heroSignupBtn');
+        const switchToLogin = document.getElementById('switchToLogin');
+        const switchToSignup = document.getElementById('switchToSignup');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const dashboard = document.getElementById('dashboard');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const memberNameEl = document.getElementById('memberName');
+        const memberStatusEl = document.getElementById('memberStatus');
+        const totalContributionsEl = document.getElementById('totalContributions');
+        const totalWithdrawalsEl = document.getElementById('totalWithdrawals');
+        const currentBalanceEl = document.getElementById('currentBalance');
+        const groupTotalSavingsEl = document.getElementById('groupTotalSavings');
+        const memberPercentageEl = document.getElementById('memberPercentage');
+        const transactionsTable = document.getElementById('transactionsTable');
+        const adminControls = document.getElementById('adminControls');
+        const adminMenuItem = document.getElementById('adminMenuItem');
+        const adminForm = document.getElementById('adminForm');
+        const memberSelect = document.getElementById('memberSelect');
+        const personalGoalsContainer = document.getElementById('personalGoalsContainer');
+        const addPersonalGoalForm = document.getElementById('addPersonalGoalForm');
+        const themeToggle = document.getElementById('themeToggle');
+
+        // Current user data
+        let currentUser = null;
+        let allMembers = [];
+        let allTransactions = [];
+        let groupTotalSavings = 0;
+
+        // Initialize the app
+        function initApp() {
+            setupAuthStateListener();
+            checkSavingReminders();
+            setupEventListeners();
+            document.getElementById('transactionDate').valueAsDate = new Date();
+        }
+
+        // Firebase Auth State Listener
+        function setupAuthStateListener() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    getUserData(user.uid).then(userData => {
+                        currentUser = userData;
+                        showDashboard();
+                        setupRealtimeListeners();
+                    });
+                } else {
+                    // User is signed out
+                    currentUser = null;
+                    hideDashboard();
+                }
+            });
+        }
+
+        // Get user data from Firestore
+        async function getUserData(userId) {
+            try {
+                const doc = await db.collection('members').doc(userId).get();
+                if (doc.exists) {
+                    return { id: userId, ...doc.data() };
+                }
+                return null;
+            } catch (error) {
+                console.error("Error getting user data:", error);
+                showNotification("Error loading user data");
+                return null;
+            }
+        }
+
+        // Setup realtime listeners for data updates
+        function setupRealtimeListeners() {
+            if (!currentUser) return;
+
+            // Listen for member updates
+            db.collection('members').onSnapshot(snapshot => {
+                allMembers = [];
+                snapshot.forEach(doc => {
+                    allMembers.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Update member select for admin
+                if (currentUser.isAdmin) {
+                    populateMemberSelect();
+                }
+                
+                // Calculate group totals
+                calculateGroupTotals();
+            });
+
+            // Listen for transaction updates
+            db.collection('transactions')
+                .where('memberId', '==', currentUser.id)
+                .orderBy('date', 'desc')
+                .limit(10)
+                .onSnapshot(snapshot => {
+                    allTransactions = [];
+                    snapshot.forEach(doc => {
+                        allTransactions.push({ id: doc.id, ...doc.data() });
+                    });
+                    updateTransactionsTable(allTransactions);
+                    updateDashboardTotals();
+                });
+
+            // Listen for all transactions if admin
+            if (currentUser.isAdmin) {
+                db.collection('transactions')
+                    .orderBy('date', 'desc')
+                    .limit(50)
+                    .onSnapshot(snapshot => {
+                        const adminTransactions = [];
+                        snapshot.forEach(doc => {
+                            adminTransactions.push({ id: doc.id, ...doc.data() });
+                        });
+                        // Admin might want to see all transactions
+                    });
+            }
+        }
+
+        // Calculate group totals and member percentages
+        function calculateGroupTotals() {
+            // Calculate total group savings
+            groupTotalSavings = allMembers.reduce((total, member) => {
+                return total + (member.balance || 0);
+            }, 0);
+            
+            groupTotalSavingsEl.textContent = `UGX${groupTotalSavings.toFixed(2)}`;
+            
+            // Calculate current user's percentage
+            if (groupTotalSavings > 0 && currentUser) {
+                const percentage = ((currentUser.balance || 0) / groupTotalSavings) * 100;
+                memberPercentageEl.textContent = `${percentage.toFixed(1)}%`;
+            } else {
+                memberPercentageEl.textContent = "0%";
+            }
+        }
+
+        // Saving reminders
+        function checkSavingReminders() {
+            const today = new Date();
+            const dayOfMonth = today.getDate();
+            
+            if (dayOfMonth === 13 || dayOfMonth === 27) {
+                showNotification("Are you ready? Saving is for tomorrow... Start planning your contribution now!");
+            }
+            
+            if (dayOfMonth === 14 || dayOfMonth === 28) {
+                showNotification("Saving is today! Don't forget to make your bi-weekly contribution.");
+            }
+        }
+
+        // Notification system
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <i class="fas fa-bell"></i>
+                <span>${message}</span>
+                <span class="notification-close">&times;</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Close notification
+            notification.querySelector('.notification-close').addEventListener('click', () => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            });
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 10000);
+        }
+
+        // Theme toggle functionality
+        function setupThemeToggle() {
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                const icon = themeToggle.querySelector('i');
+                if (document.body.classList.contains('dark-mode')) {
+                    icon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    icon.classList.replace('fa-sun', 'fa-moon');
+                }
+                localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            });
+
+            // Check for saved theme preference
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                themeToggle.querySelector('i').classList.replace('fa-moon', 'fa-sun');
+            }
+        }
+
+        // Personal goals functionality
+        function renderPersonalGoals() {
+            personalGoalsContainer.innerHTML = '';
+            
+            if (!currentUser || !currentUser.personalGoals) return;
+            
+            currentUser.personalGoals.forEach(goal => {
+                const progressPercent = Math.min(100, (goal.current / goal.target) * 100);
+                const goalEl = document.createElement('div');
+                goalEl.className = 'goal-card';
+                goalEl.innerHTML = `
+                    <h3>${goal.name}</h3>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: ${progressPercent}%"></div>
+                    </div>
+                    <p>UGX${goal.current.toFixed(2)} / UGX${goal.target.toFixed(2)} (${Math.round(progressPercent)}%)</p>
+                    <div class="goal-actions">
+                        <button class="edit-btn" data-id="${goal.id}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="delete-btn" data-id="${goal.id}"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                `;
+                personalGoalsContainer.appendChild(goalEl);
+            });
+
+            // Add event listeners to buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const goalId = e.target.getAttribute('data-id');
+                    editPersonalGoal(goalId);
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const goalId = e.target.getAttribute('data-id');
+                    deletePersonalGoal(goalId);
+                });
+            });
+        }
+
+        async function editPersonalGoal(goalId) {
+            const goal = currentUser.personalGoals.find(g => g.id === goalId);
+            if (!goal) return;
+
+            const newName = prompt("Edit goal name:", goal.name);
+            if (newName === null) return;
+
+            const newTarget = parseFloat(prompt("Edit target amount:", goal.target));
+            if (isNaN(newTarget)) return;
+
+            goal.name = newName;
+            goal.target = newTarget;
+            
+            try {
+                await db.collection('members').doc(currentUser.id).update({
+                    personalGoals: currentUser.personalGoals
+                });
+                renderPersonalGoals();
+                showNotification("Goal updated successfully!");
+            } catch (error) {
+                console.error("Error updating goal:", error);
+                showNotification("Error updating goal");
+            }
+        }
+
+        async function deletePersonalGoal(goalId) {
+            if (confirm("Are you sure you want to delete this goal?")) {
+                currentUser.personalGoals = currentUser.personalGoals.filter(g => g.id !== goalId);
+                
+                try {
+                    await db.collection('members').doc(currentUser.id).update({
+                        personalGoals: currentUser.personalGoals
+                    });
+                    renderPersonalGoals();
+                    showNotification("Goal deleted successfully!");
+                } catch (error) {
+                    console.error("Error deleting goal:", error);
+                    showNotification("Error deleting goal");
+                }
+            }
+        }
+
+        // Modal functions
+        function openModal(modal) {
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => modal.classList.add('show'), 10);
+        }
+
+        function closeModal(modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        // Dashboard functions
+        function showDashboard() {
+            dashboard.style.display = 'block';
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.features').style.display = 'none';
+            document.querySelector('footer').style.display = 'none';
+            updateDashboard();
+        }
+
+        function hideDashboard() {
+            dashboard.style.display = 'none';
+            document.querySelector('.hero').style.display = 'block';
+            document.querySelector('.features').style.display = 'block';
+            document.querySelector('footer').style.display = 'block';
+            loginForm.reset();
+        }
+
+        function updateDashboard() {
+            if (!currentUser) return;
+
+            // Set user info
+            memberNameEl.textContent = currentUser.name;
+            memberStatusEl.textContent = currentUser.isAdmin ? 'Admin' : 'Member';
+            
+            if (currentUser.isAdmin) {
+                adminControls.style.display = 'block';
+                adminMenuItem.style.display = 'block';
+                memberStatusEl.style.backgroundColor = '#ff9800'; // Orange for admin
+            } else {
+                adminControls.style.display = 'none';
+                adminMenuItem.style.display = 'none';
+                memberStatusEl.style.backgroundColor = '#2962ff'; // Blue for member
+            }
+
+            // Update dashboard totals
+            updateDashboardTotals();
+
+            // Render personal goals
+            renderPersonalGoals();
+
+            // If admin, populate member select
+            if (currentUser.isAdmin) {
+                populateMemberSelect();
+            }
+        }
+
+        function updateDashboardTotals() {
+            if (!currentUser) return;
+
+            // Calculate totals from transactions
+            const contributions = allTransactions
+                .filter(t => t.type === 'contribution')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const withdrawals = allTransactions
+                .filter(t => t.type === 'withdrawal')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const balance = contributions - withdrawals;
+
+            // Update totals display
+            totalContributionsEl.textContent = `UGX${contributions.toFixed(2)}`;
+            totalWithdrawalsEl.textContent = `UGX${withdrawals.toFixed(2)}`;
+            currentBalanceEl.textContent = `UGX${balance.toFixed(2)}`;
+
+            // Calculate group totals and percentages
+            calculateGroupTotals();
+        }
+
+        function updateTransactionsTable(transactions) {
+            transactionsTable.innerHTML = '';
+            
+            transactions.forEach(tx => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${tx.date}</td>
+                    <td>${tx.description}</td>
+                    <td>UGX${tx.amount.toFixed(2)}</td>
+                    <td>${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)}</td>
+                    <td><span class="status status-${tx.status}">${tx.status.charAt(0).toUpperCase() + tx.status.slice(1)}</span></td>
+                `;
+                
+                transactionsTable.appendChild(row);
+            });
+        }
+
+        function populateMemberSelect() {
+            memberSelect.innerHTML = '<option value="">Select Member</option>';
+            
+            allMembers
+                .filter(member => !member.isAdmin && member.id !== currentUser.id)
+                .forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member.id;
+                    option.textContent = member.name;
+                    memberSelect.appendChild(option);
+                });
+        }
+
+        // Event listeners setup
+        function setupEventListeners() {
+            // Modal buttons
+            loginBtn.addEventListener('click', () => openModal(loginModal));
+            signupBtn.addEventListener('click', () => openModal(signupModal));
+            heroLoginBtn.addEventListener('click', () => openModal(loginModal));
+            heroSignupBtn.addEventListener('click', () => openModal(signupModal));
+            switchToLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal(signupModal);
+                openModal(loginModal);
+            });
+            switchToSignup.addEventListener('click', (e) => {
+                e.preventDefault();
+                closeModal(loginModal);
+                openModal(signupModal);
+            });
+
+            // Close modal when clicking X or outside
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal);
+                });
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target.classList.contains('modal')) {
+                    closeModal(e.target);
+                }
+            });
+
+            // Login function
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+
+                try {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    closeModal(loginModal);
+                } catch (error) {
+                    console.error("Login error:", error);
+                    showNotification('Invalid email or password');
+                }
+            });
+
+            // Logout function
+            logoutBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    await auth.signOut();
+                } catch (error) {
+                    console.error("Logout error:", error);
+                    showNotification('Error logging out');
+                }
+            });
+
+            // Signup function
+            signupForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const confirmPassword = document.getElementById('signupConfirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    showNotification('Passwords do not match');
+                    return;
+                }
+
+                const userData = {
+                    name: document.getElementById('signupFullname').value,
+                    email: email,
+                    phone: document.getElementById('signupPhone').value,
+                    isAdmin: false,
+                    balance: 0,
+                    personalGoals: []
+                };
+
+                try {
+                    // Create user in Firebase Auth
+                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                    
+                    // Create user document in Firestore
+                    await db.collection('members').doc(userCredential.user.uid).set(userData);
+                    
+                    closeModal(signupModal);
+                    showNotification('Account created successfully!');
+                } catch (error) {
+                    console.error("Signup error:", error);
+                    showNotification('Error creating account: ' + error.message);
+                }
+            });
+
+            // Admin form submission
+            adminForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const memberId = memberSelect.value;
+                const type = document.getElementById('transactionType').value;
+                const amount = parseFloat(document.getElementById('transactionAmount').value);
+                const date = document.getElementById('transactionDate').value;
+                const description = document.getElementById('transactionDescription').value;
+                
+                if (!memberId || !amount || !date || !description) {
+                    showNotification('Please fill all fields');
+                    return;
+                }
+                
+                try {
+                    // Add transaction to Firestore
+                    await db.collection('transactions').add({
+                        memberId,
+                        date,
+                        description,
+                        amount,
+                        type,
+                        status: 'completed',
+                        recordedBy: currentUser.id,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    // Update member's balance
+                    const member = allMembers.find(m => m.id === memberId);
+                    if (member) {
+                        const newBalance = type === 'contribution' 
+                            ? (member.balance || 0) + amount 
+                            : (member.balance || 0) - amount;
+                        
+                        await db.collection('members').doc(memberId).update({
+                            balance: newBalance
+                        });
+                    }
+                    
+                    adminForm.reset();
+                    document.getElementById('transactionDate').valueAsDate = new Date();
+                    showNotification('Transaction recorded successfully');
+                } catch (error) {
+                    console.error("Error recording transaction:", error);
+                    showNotification('Error recording transaction');
+                }
+            });
+
+            // Add personal goal form submission
+            addPersonalGoalForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const goalName = document.getElementById('personalGoalName').value;
+                const goalAmount = parseFloat(document.getElementById('personalGoalAmount').value);
+                
+                if (!goalName || !goalAmount) {
+                    showNotification('Please fill all fields');
+                    return;
+                }
+                
+                const newGoal = {
+                    id: Date.now().toString(),
+                    name: goalName,
+                    target: goalAmount,
+                    current: 0
+                };
+                
+                try {
+                    // Update user's goals in Firestore
+                    await db.collection('members').doc(currentUser.id).update({
+                        personalGoals: firebase.firestore.FieldValue.arrayUnion(newGoal)
+                    });
+                    
+                    addPersonalGoalForm.reset();
+                    showNotification('New personal savings goal added!');
+                } catch (error) {
+                    console.error("Error adding goal:", error);
+                    showNotification('Error adding goal');
+                }
+            });
+
+            // Mobile menu toggle
+            document.querySelector('.hamburger').addEventListener('click', function() {
+                document.querySelector('.nav-links').classList.toggle('active');
+            });
+
+            // Setup theme toggle
+            setupThemeToggle();
+        }
+
+        // Initialize the app
+        initApp();
+    </script>
+</body>
+</html>
